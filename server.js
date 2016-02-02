@@ -21,7 +21,8 @@ require('./socket/test.js')(io);
 require('./routes/user.js')(app);
 
 app.on('stormpath.ready', function() {
-	server.listen(3000, function() {
+	server.listen(8080, function() {
+		// console.log(process.env);
 		console.log('Ready!');
 	});
 });
