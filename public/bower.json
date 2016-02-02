@@ -1,0 +1,21 @@
+{
+  "name": "public",
+  "authors": [
+    "Chu Hoang Son <chuson1996@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "socket.io-client": "~1.4.5"
+  }
+}
