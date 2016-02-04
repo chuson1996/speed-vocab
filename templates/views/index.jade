@@ -1,18 +1,24 @@
 doctype html
-html
+html(ng-app="speedvocab")
 	head
 		title Hi
-	body
+		script(src="bower_components/angular/angular.min.js")
+		script(src="/socket.io/socket.io.js")
+		script(src='bower_components/angular-socket-io/socket.min.js')
+	body(ng-controller="MainController as main")
 		if fullName
 			h1 Hi #{fullName}
 			h1 Email: #{email}
 			
-		script(src='bower_components/socket.io-client/socket.io.js')
-		script.
-			var socket = io.connect('http://localhost:3000');
-			socket.on('news', function(data) {
-				console.log(data);
-				socket.emit('my other event', {
-					my: 'data'
-				});
-			});
+		
+		script(src='js/dest/bundle.js')
+		script(src='http://localhost:35729/livereload.js')
+		
+		// script.
+		// 	var socket = io.connect('/');
+		// 	socket.on('news', function(data) {
+		// 		console.log(data);
+		// 		socket.emit('my other event', {
+		// 			my: 'data'
+		// 		});
+		// 	});

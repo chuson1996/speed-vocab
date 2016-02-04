@@ -4,7 +4,7 @@ var _ = require("lodash");
 
 module.exports = function(app, stormpath) {
 	// console.log(require('./user.js')());
-	startRoutes(require('./user.js')(stormpath));
+	startRoutes(require('./user-routes.js')(stormpath));
 	
 	function startRoutes(routesExtension) {
 		var viewsDir = path.join(__dirname, '../templates/views');
@@ -14,7 +14,7 @@ module.exports = function(app, stormpath) {
 		var routes = dirArr.map(function(item) {
 			var routeUrl = item == '/index.jade' ? '/' : stripExt(item);
 			var jadePath = path.join(viewsDir, item);
-			console.log(routeUrl, jadePath);
+			// console.log(routeUrl, jadePath);
 			return {
 				routeUrl: routeUrl,
 				jadePath: jadePath
@@ -55,7 +55,7 @@ module.exports = function(app, stormpath) {
 			
 			params.push(route.callback);
 			
-			console.log('params:', params);
+			// console.log('params:', params);
 	
 			app.get.apply(app, params);
 		});
