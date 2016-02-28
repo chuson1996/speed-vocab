@@ -7,9 +7,13 @@ module.exports = function (stormpath) {
 				res.render(this.jadePath, req.user || {});
 			})
 		},
-		{
-		    routeUrl: '/test',
-		    middlewares: [stormpath.loginRequired]
-		}
+		// {
+		//     routeUrl: '/test',
+		//     middlewares: [stormpath.loginRequired]
+		// },
+		// {
+		// 	routeUrl: '/app',
+		// 	middlewares: [stormpath.loginRequired]
+		// }
 	];
 };

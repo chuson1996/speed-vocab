@@ -1,0 +1,31 @@
+- var dependencyRoot = 'node_modules';
+html
+	head
+		title SpeedVocab App
+		base(href="/app")
+		meta(name="viewport" content="width=device-width, initial-scale=1")
+
+		script(src="#{dependencyRoot}/es6-shim/es6-shim.js")
+		script(src="#{dependencyRoot}/es6-promise/dist/es6-promise.js")
+		//- script(src="#{dependencyRoot}/systemjs/dist/system-polyfills.js")
+
+		script(src="#{dependencyRoot}/angular2/bundles/angular2-polyfills.js")
+		//- script(src="#{dependencyRoot}/systemjs/dist/system.src.js")
+		script(src="#{dependencyRoot}/rxjs/bundles/Rx.umd.js")
+		script(src="#{dependencyRoot}/angular2/bundles/angular2-all.umd.dev.js")
+		script(src="#{dependencyRoot}/immutable/dist/immutable.js")
+
+		script(src="#{dependencyRoot}/jquery/dist/jquery.js")
+		script(src="#{dependencyRoot}/lodash/lodash.js")
+
+		link(rel="stylesheet", type="text/css", href="#{dependencyRoot}/bootstrap/dist/css/bootstrap.css")
+		script(src="#{dependencyRoot}/bootstrap/dist/js/bootstrap.min.js")
+			
+		link(rel="stylesheet", type="text/css", href="css/main.css")
+
+	body.container
+		.row: .col-xs-12
+			first-try
+
+		script(src="js/dest/bundle.js")
+		script(src="http://localhost:8081/livereload.js")

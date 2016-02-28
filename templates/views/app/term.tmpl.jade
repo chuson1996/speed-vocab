@@ -1,0 +1,11 @@
+| {{value}}
+input.form-control(type='text', [value]="term.get('word')", #wordInput="", (input)="0") 
+
+input.form-control(type='text', [value]="term.get('meaning')", #meaningInput="", (input)="0")
+
+.col-sm-6
+	| {{ term | displayTerm }}
+.col-sm-6
+	button.btn.btn-primary((click)="updateTerm(wordInput, meaningInput)") Update
+	button.btn.btn-warning((click)="learnTerm()") Learn
+	button.btn.btn-danger((click)="deleteTerm()") Delete

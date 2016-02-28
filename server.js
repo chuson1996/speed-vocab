@@ -17,31 +17,41 @@ app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(stormpath.init(app, {
-	website: true,
-	expand: {
-		groupMemberships: true,
-		apiKeys: true
-	},
-	client: {
-		apiKey: {
-			id: credentials.dev.stormpath.client_apikey_id,
-			secret: credentials.dev.stormpath.client_apikey_secret
-		}
-	},
-	application: {
-		href: credentials.dev.stormpath.application_href
-	},
-	debug: 'info, error'
-}));
+// app.use(stormpath.init(app, {
+// 	// website: true,
+// 	web: {
+// 		login: {
+// 			enabled: true,
+// 			nextUri: '/app'
+// 		},
+// 		logout: {
+// 			enabled: true,
+// 			nextUri: '/'
+// 		}
+// 	},
+// 	expand: {
+// 		groupMemberships: true,
+// 		apiKeys: true
+// 	},
+// 	client: {
+// 		apiKey: {
+// 			id: credentials.dev.stormpath.client_apikey_id,
+// 			secret: credentials.dev.stormpath.client_apikey_secret
+// 		}
+// 	},
+// 	application: {
+// 		href: credentials.dev.stormpath.application_href
+// 	},
+// 	debug: 'info, error'
+// }));
 require('./api/index.js')(app, stormpath);
 require('./database/mongolab.js')(app);
 require('./socket/test.js')(io);
 require('./routes/config.js')(app, stormpath);
 
-app.on('stormpath.ready', function() {
-	server.listen(process.env.PORT, function() {
+// app.on('stormpath.ready', function() {
+	server.listen(process.env.PORT || 8080, function() {
 		// console.log(process.env);
 		console.log('Ready!');
 	});
-});
+// });

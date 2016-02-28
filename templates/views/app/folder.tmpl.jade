@@ -1,0 +1,25 @@
+form.form-group((submit)="submit($event)", #newTermForm="ngForm")
+	label.label-control Word
+	//- div
+	input.form-control(type='text', name="word", placeholder="Enter a word:", required, ngControl="word", #word="ngForm", floating-span="&nbsp;euro", floating-span-class="form-control")
+	span([hidden]="word.valid || word.untouched") Please enter a word
+	br
+	label.label-control Meaning
+	input.form-control(type='text', placeholder="Now enter its meaning", name="meaning", #meaningInput="", required, ngControl="meaning")
+	span Please its meaning too
+	br
+	button.btn.btn-success(type="submit", [disabled]="!newTermForm.valid") Submit
+input.form-control(placeholder="Type of search key", #key="", type="text", (input)) 
+br
+h2 Filter for terms containing "{{key.value}}"
+
+.row: .col-sm-6
+	//- div(*ngFor="#term of terms | contains:key.value")
+	//- 	term([term]="term")
+	div(*ngFor="#immTerm of immTerms")
+		term([term]="immTerm")
+
+//- br
+| {{terms | length}} <br>
+| {{terms | generalizeFolder}}
+code This doesn't work if 'terms' is mutable

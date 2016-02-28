@@ -1,0 +1,12 @@
+.form-control {
+  background-color: transparent; }
+
+span.floating-span {
+  position: absolute;
+  z-index: -1;
+  transition: margin-left ease .1s; }
+  span.floating-span.form-control {
+    border: 1px solid transparent;
+    width: auto; }
+
+/*# sourceMappingURL=main.css.map */

@@ -12,7 +12,9 @@ module.exports = function(app, stormpath) {
 		var dirArr = [];
 		transmuteDirectoryTreeToArray(dirTree, dirArr, '/');
 		var routes = dirArr.map(function(item) {
-			var routeUrl = item == '/index.jade' ? '/' : stripExt(item);
+			var routeUrl = stripExt(item.replace('/index.jade', '')
+					);
+			routeUrl == '.' && (routeUrl = '/');
 			var jadePath = path.join(viewsDir, item);
 			// console.log(routeUrl, jadePath);
 			return {
@@ -46,7 +48,7 @@ module.exports = function(app, stormpath) {
 			
 			return route;
 		});
-		
+		// console.log('Routes: ', routes);
 		routes.forEach(function (route) {
 			// console.log(route);
 			var params = [route.routeUrl];
