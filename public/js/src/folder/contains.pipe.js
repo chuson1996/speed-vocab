@@ -1,9 +1,10 @@
-import a from '../a.js';
+import a from 'a';
 
 class ContainsPipe {
 	transform (value, args) {
 		return value.filter((term) => {
-			return term.word.includes(args[0]);
+			// return term.word.includes(args[0]);
+			return term.get('word').includes(args[0]);
 		});
 	}
 }

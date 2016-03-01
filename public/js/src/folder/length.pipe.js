@@ -2,7 +2,7 @@ import a from '../a.js';
 
 class LengthPipe {
 	transform(value, args) {
-		return value.length;
+		return value.size || value.length;
 	}
 }
 a.Pipe({

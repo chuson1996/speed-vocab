@@ -1,1 +1,10 @@
 h1 Let's learn yo!
+
+form((submit)="onSubmit($event)", [ngClass]="{hide: !studyLogic.active}")
+	h1 Your word: {{ currentTerm.word }}
+	div([ngClass]="{hide: !showCorrectAnswer}")
+		h3.text-success {{ currentTerm.meaning }}
+	input.form-control(type="text", placeholder="Answer", name="answer")
+	button.btn.btn-success(type="submit") Submit
+
+button.btn.btn-danger((click)="reset()", type="button", [ngClass]="{hide: studyLogic.active}") Study again!

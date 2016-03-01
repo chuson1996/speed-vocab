@@ -1,13 +1,15 @@
 import a from 'a';
 
-import { LocalStorageManagement } from '../injectors/local-storage-management.js';
-import { TermsLogic } from '../injectors/terms-logic.js';
-import { DisplayTermPipe } from '../term/display-term-pipe.js';
-import { LengthPipe } from '../folder/length-pipe.js';
-import { ContainsPipe } from '../folder/contains-pipe.js';
-import { GeneralizeFolderPipe } from '../folder/generalize-folder-pipe.js';
+import { LocalStorageManagement } from '../injectables/local-storage-management.js';
+import { TermsLogic } from '../injectables/terms-logic.js';
+import { DisplayTermPipe } from '../term/display-term.pipe.js';
+import { LengthPipe } from '../folder/length.pipe.js';
+import { ContainsPipe } from '../folder/contains.pipe.js';
+import { GeneralizeFolderPipe } from '../folder/generalize-folder.pipe.js';
 import { TermComponent } from '../term/term.component.js';
 import { FloatingSpan } from '../directives/floating-span.js';
+import { TagsInput } from '../directives/tags-input.js';
+import { StudyComponent } from '../study/study.component.js';
 
 class FolderComponent {
 	constructor(localStorageManagement, termsLogic) {
@@ -28,7 +30,9 @@ class FolderComponent {
 		});
 
 
+		// Deprecated
 		this.terms = this.termsLogic.terms;
+		
 		this.immTerms = this.termsLogic._terms;
 		this.termsLogic.termsChanged.subscribe((newTerms) => {
 			this.terms = this.termsLogic.terms;
@@ -57,7 +61,7 @@ FolderComponent.parameters = [
 a.Component({
 	templateUrl: '/app/folder.tmpl',
 	pipes: [LengthPipe, DisplayTermPipe, ContainsPipe, GeneralizeFolderPipe],
-	directives: [TermComponent, FloatingSpan],
+	directives: [TermComponent, FloatingSpan, StudyComponent, TagsInput],
 }).for(FolderComponent);
 
 export default {FolderComponent};

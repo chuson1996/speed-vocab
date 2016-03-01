@@ -11,56 +11,62 @@ var _a2 = _interopRequireDefault(_a);
 
 // Folder
 
-var _folderLengthPipeJs = require('./folder/length-pipe.js');
+var _folderLengthPipeJs = require('./folder/length.pipe.js');
 
-var _folderContainsPipeJs = require('./folder/contains-pipe.js');
+var _folderContainsPipeJs = require('./folder/contains.pipe.js');
 
 var _folderFolderComponentJs = require('./folder/folder.component.js');
 
-var _folderGeneralizeFolderPipeJs = require('./folder/generalize-folder-pipe.js');
+var _folderGeneralizeFolderPipeJs = require('./folder/generalize-folder.pipe.js');
 
 // Term
 
-var _termDisplayTermPipeJs = require('./term/display-term-pipe.js');
+var _termDisplayTermPipeJs = require('./term/display-term.pipe.js');
 
 var _termTermComponentJs = require('./term/term.component.js');
 
+// Study
+
+var _studyStudyComponentJs = require('./study/study.component.js');
+
 // Global Injectables
 
-var _injectorsLocalStorageManagementJs = require('./injectors/local-storage-management.js');
+var _injectablesLocalStorageManagementJs = require('./injectables/local-storage-management.js');
 
-var _injectorsTermsLogicJs = require('./injectors/terms-logic.js');
+var _injectablesTermsLogicJs = require('./injectables/terms-logic.js');
 
-var _injectorsTermsLogicMockJs = require('./injectors/terms-logic-mock.js');
+var _injectablesTermsLogicMockJs = require('./injectables/terms-logic-mock.js');
 
 // Directives
 
 var _directivesFloatingSpanJs = require('./directives/floating-span.js');
 
+var _directivesTagsInputJs = require('./directives/tags-input.js');
+
 // Global Factories
 
 var _factoriesGetTextBoundingRectJs = require('./factories/get-text-bounding-rect.js');
+
+var _factoriesStudySchemeJs = require('./factories/study-scheme.js');
 
 var AppComponent = function AppComponent() {
 	_classCallCheck(this, AppComponent);
 };
 
-AppComponent.parameters = [new ng.core.Inject(_injectorsLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectorsTermsLogicJs.TermsLogic)];
-_a2['default'].RouteConfig([{ path: '/folder', name: 'Folder', component: _folderFolderComponentJs.FolderComponent, useAsDefault: true }]).
-// { path: '/study', name: 'Study' }
-Component({
-	templateUrl: 'app/first-try.tmpl',
-	selector: 'first-try',
-	providers: [_injectorsLocalStorageManagementJs.LocalStorageManagement, ng.core.provide(_injectorsTermsLogicJs.TermsLogic, { useClass: _injectorsTermsLogicJs.TermsLogic }), ng.core.ElementRef, ng.core.provide('getTextBoundingRect', { useFactory: function useFactory() {
+AppComponent.parameters = [new ng.core.Inject(_injectablesLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic)];
+_a2['default'].RouteConfig([{ path: '/folder', name: 'Folder', component: _folderFolderComponentJs.FolderComponent, useAsDefault: true }, { path: '/study', name: 'Study', component: _studyStudyComponentJs.StudyComponent }]).Component({
+	templateUrl: 'app/app.tmpl',
+	selector: 'app',
+	providers: [_injectablesLocalStorageManagementJs.LocalStorageManagement, ng.core.provide(_injectablesTermsLogicJs.TermsLogic, { useClass: _injectablesTermsLogicJs.TermsLogic }), ng.core.ElementRef, ng.core.provide('getTextBoundingRect', { useFactory: function useFactory() {
 			return _factoriesGetTextBoundingRectJs.getTextBoundingRect;
-		} }), ng.router.ROUTER_PROVIDERS, ng.core.provide(ng.router.LocationStrategy, { useClass: ng.router.HashLocationStrategy })],
+		} }), ng.router.ROUTER_PROVIDERS, ng.core.provide(ng.router.LocationStrategy, { useClass: ng.router.HashLocationStrategy }), ng.core.provide('studyScheme', { useFactory: _factoriesStudySchemeJs.studyScheme }), _directivesTagsInputJs.TagsInput],
 	directives: [ng.router.RouterOutlet, ng.router.RouterLink]
 
 })['for'](AppComponent);
 
 ng.platform.browser.bootstrap(AppComponent);
 
-},{"./directives/floating-span.js":2,"./factories/get-text-bounding-rect.js":3,"./folder/contains-pipe.js":4,"./folder/folder.component.js":5,"./folder/generalize-folder-pipe.js":6,"./folder/length-pipe.js":7,"./injectors/local-storage-management.js":8,"./injectors/terms-logic-mock.js":9,"./injectors/terms-logic.js":10,"./term/display-term-pipe.js":11,"./term/term.component.js":12,"a":"a"}],2:[function(require,module,exports){
+},{"./directives/floating-span.js":2,"./directives/tags-input.js":3,"./factories/get-text-bounding-rect.js":4,"./factories/study-scheme.js":5,"./folder/contains.pipe.js":6,"./folder/folder.component.js":7,"./folder/generalize-folder.pipe.js":8,"./folder/length.pipe.js":9,"./injectables/local-storage-management.js":10,"./injectables/terms-logic-mock.js":11,"./injectables/terms-logic.js":12,"./study/study.component.js":13,"./term/display-term.pipe.js":14,"./term/term.component.js":15,"a":"a"}],2:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -123,6 +129,65 @@ exports['default'] = { FloatingSpan: FloatingSpan };
 module.exports = exports['default'];
 
 },{"a":"a"}],3:[function(require,module,exports){
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _a = require('a');
+
+var _a2 = _interopRequireDefault(_a);
+
+var TagsInput = (function () {
+	function TagsInput(elementRef) {
+		_classCallCheck(this, TagsInput);
+
+		_.assign(this, {
+			elementRef: elementRef
+		});
+
+		this.onChange = new ng.core.EventEmitter();
+		this.onTagAdded = new ng.core.EventEmitter();
+		this.onTagRemoved = new ng.core.EventEmitter();
+
+		this.elem = this.elementRef.nativeElement;
+		console.log(this.elem);
+	}
+
+	TagsInput.prototype.ngAfterViewInit = function ngAfterViewInit() {
+		var _this = this;
+
+		console.log('ngAfterViewInit');
+		$(this.elem).tagsInput({
+			onAddTag: function onAddTag(event) {
+				return _this.onTagAdded.emit(event);
+			},
+			onTagRemoved: function onTagRemoved(event) {
+				return _this.onTagRemoved.emit(event);
+			},
+			onChange: function onChange(event) {
+				return _this.onChange.emit(event);
+			},
+			delimiter: ','
+		});
+	};
+
+	return TagsInput;
+})();
+
+TagsInput.parameters = [new ng.core.Inject(ng.core.ElementRef)];
+_a2['default'].Directive({
+	selector: '[tags-input]',
+	outputs: ['onChange', 'onTagAdded', 'onTagRemoved']
+})['for'](TagsInput);
+
+exports['default'] = { TagsInput: TagsInput };
+module.exports = exports['default'];
+
+},{"a":"a"}],4:[function(require,module,exports){
 // Solution from http://stackoverflow.com/questions/6930578/get-cursor-or-text-position-in-pixels-for-input-element
 "use strict";
 
@@ -229,41 +294,156 @@ function getTextBoundingRect(input, selectionStart, selectionEnd, debug) {
 	}
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+exports.studyScheme = studyScheme;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _aJs = require('../a.js');
+var _a = require('a');
 
-var _aJs2 = _interopRequireDefault(_aJs);
+var _a2 = _interopRequireDefault(_a);
 
-var ContainsPipe = (function () {
-	function ContainsPipe() {
-		_classCallCheck(this, ContainsPipe);
+var StudyScheme = (function () {
+	function StudyScheme(terms) {
+		_classCallCheck(this, StudyScheme);
+
+		this.terms = terms; // Mutable object / JSON object
+
+		this.learnTermEvent = new ng.core.EventEmitter();
+		this.completeEvent = new ng.core.EventEmitter();
+
+		this.reset();
 	}
 
-	ContainsPipe.prototype.transform = function transform(value, args) {
-		return value.filter(function (term) {
-			return term.word.includes(args[0]);
-		});
+	StudyScheme.prototype.divideTermsIntoGroups = function divideTermsIntoGroups(terms) {
+		return _.chunk(_.shuffle(terms), 7);
 	};
 
-	return ContainsPipe;
+	StudyScheme.prototype.next = function next() {
+		if (!this.active) throw new Error('StudyLogic is not active at the moment');
+
+		if (this.groups[this.currentGroupIndex] && this.currentTermIndex < this.groups[this.currentGroupIndex].length) {
+			this.currentTermIndex++;
+			if (this.groups[this.currentGroupIndex][this.currentTermIndex] && this.groups[this.currentGroupIndex][this.currentTermIndex].pass) {
+				return this.next();
+			}
+		} else {
+			if (this.currentGroupIndex < this.groups.length) {
+				// Check if some terms in this group are still not passed. If there're, study them.
+				if (_.some(this.groups[this.currentGroupIndex], function (term) {
+					return !term.pass;
+				})) {
+					console.log('There\'re some terms in this group are still not passed, study them.');
+					this.currentTermIndex = _.findIndex(this.groups[this.currentGroupIndex], function (term) {
+						return !term.pass;
+					});
+				} else {
+					console.log('Next group');
+					this.currentTermIndex = 0;
+					this.currentGroupIndex++;
+				}
+			} else {
+				return this.complete();
+			}
+		}
+
+		if (this.currentGroupIndex == this.groups.length || this.currentTermIndex == this.groups[this.currentGroupIndex].length) {
+			this.next();
+		}
+	};
+
+	StudyScheme.prototype.complete = function complete() {
+		console.log('Complete');
+		this.completeEvent.emit(null);
+		this.active = false;
+	};
+
+	StudyScheme.prototype.check = function check(_ref2) {
+		var id = _ref2.id;
+		var field = _ref2.field;
+		var answer = _ref2.answer;
+
+		var term = _.find(this.terms, { id: id });
+		console.log(term[field].toLowerCase(), answer.toLowerCase());
+		return term[field].toLowerCase() == answer.toLowerCase();
+	};
+
+	StudyScheme.prototype.checkAndUpdate = function checkAndUpdate(_ref3) {
+		var id = _ref3.id;
+		var field = _ref3.field;
+		var answer = _ref3.answer;
+
+		var result = this.check({ id: id, field: field, answer: answer });
+		if (result) {
+			var currentTerm = _.find(this.terms, { id: id });
+			this.learnTermEvent.emit(currentTerm);
+			currentTerm.pass = true;
+		}
+		return result;
+	};
+
+	StudyScheme.prototype.checkAndReact = function checkAndReact(_ref4) {
+		var id = _ref4.id;
+		var field = _ref4.field;
+		var answer = _ref4.answer;
+		var goToNext = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+		if (this.check({ id: id, field: field, answer: answer })) {
+			var currentTerm = _.find(this.terms, { id: id });
+			this.learnTermEvent.emit(currentTerm);
+			currentTerm.pass = true;
+		}
+		if (goToNext) this.next();
+	};
+
+	StudyScheme.prototype.reset = function reset() {
+		this.active = true;
+		this.groups = this.divideTermsIntoGroups(this.terms);
+		for (var _iterator = this.terms, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+			var _ref;
+
+			if (_isArray) {
+				if (_i >= _iterator.length) break;
+				_ref = _iterator[_i++];
+			} else {
+				_i = _iterator.next();
+				if (_i.done) break;
+				_ref = _i.value;
+			}
+
+			var term = _ref;
+
+			_.assign(term, { pass: false });
+		}
+		this.currentGroupIndex = 0;
+		this.currentTermIndex = 0;
+	};
+
+	_createClass(StudyScheme, [{
+		key: 'currentTerm',
+		get: function get() {
+			return _.get(this.groups, '[' + this.currentGroupIndex + '][' + this.currentTermIndex + ']') || {};
+		}
+	}]);
+
+	return StudyScheme;
 })();
 
-_aJs2['default'].Pipe({
-	name: 'contains'
-})['for'](ContainsPipe);
-exports['default'] = { ContainsPipe: ContainsPipe };
-module.exports = exports['default'];
-// pure: false
+function studyScheme() {
+	return function (terms) {
+		return new StudyScheme(terms);
+	};
+}
 
-},{"../a.js":"a"}],5:[function(require,module,exports){
+},{"a":"a"}],6:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -276,21 +456,60 @@ var _a = require('a');
 
 var _a2 = _interopRequireDefault(_a);
 
-var _injectorsLocalStorageManagementJs = require('../injectors/local-storage-management.js');
+var ContainsPipe = (function () {
+	function ContainsPipe() {
+		_classCallCheck(this, ContainsPipe);
+	}
 
-var _injectorsTermsLogicJs = require('../injectors/terms-logic.js');
+	ContainsPipe.prototype.transform = function transform(value, args) {
+		return value.filter(function (term) {
+			// return term.word.includes(args[0]);
+			return term.get('word').includes(args[0]);
+		});
+	};
 
-var _termDisplayTermPipeJs = require('../term/display-term-pipe.js');
+	return ContainsPipe;
+})();
 
-var _folderLengthPipeJs = require('../folder/length-pipe.js');
+_a2['default'].Pipe({
+	name: 'contains'
+})['for'](ContainsPipe);
+exports['default'] = { ContainsPipe: ContainsPipe };
+module.exports = exports['default'];
+// pure: false
 
-var _folderContainsPipeJs = require('../folder/contains-pipe.js');
+},{"a":"a"}],7:[function(require,module,exports){
+'use strict';
 
-var _folderGeneralizeFolderPipeJs = require('../folder/generalize-folder-pipe.js');
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _a = require('a');
+
+var _a2 = _interopRequireDefault(_a);
+
+var _injectablesLocalStorageManagementJs = require('../injectables/local-storage-management.js');
+
+var _injectablesTermsLogicJs = require('../injectables/terms-logic.js');
+
+var _termDisplayTermPipeJs = require('../term/display-term.pipe.js');
+
+var _folderLengthPipeJs = require('../folder/length.pipe.js');
+
+var _folderContainsPipeJs = require('../folder/contains.pipe.js');
+
+var _folderGeneralizeFolderPipeJs = require('../folder/generalize-folder.pipe.js');
 
 var _termTermComponentJs = require('../term/term.component.js');
 
 var _directivesFloatingSpanJs = require('../directives/floating-span.js');
+
+var _directivesTagsInputJs = require('../directives/tags-input.js');
+
+var _studyStudyComponentJs = require('../study/study.component.js');
 
 var FolderComponent = (function () {
 	function FolderComponent(localStorageManagement, termsLogic) {
@@ -299,7 +518,7 @@ var FolderComponent = (function () {
 		_classCallCheck(this, FolderComponent);
 
 		{
-			var injector = ng.core.Injector.resolveAndCreate([ng.core.provide(_injectorsLocalStorageManagementJs.LocalStorageManagement, { useClass: _injectorsLocalStorageManagementJs.LocalStorageManagement }), ng.core.provide('OtherLocalStorageManagement', { useExisting: _injectorsLocalStorageManagementJs.LocalStorageManagement }), ng.core.provide(String, { useValue: 'Hi from babel to Angular 2' })]);
+			var injector = ng.core.Injector.resolveAndCreate([ng.core.provide(_injectablesLocalStorageManagementJs.LocalStorageManagement, { useClass: _injectablesLocalStorageManagementJs.LocalStorageManagement }), ng.core.provide('OtherLocalStorageManagement', { useExisting: _injectablesLocalStorageManagementJs.LocalStorageManagement }), ng.core.provide(String, { useValue: 'Hi from babel to Angular 2' })]);
 			// console.log(injector.get(LocalStorageManagement) == injector.get('OtherLocalStorageManagement'));
 			console.log(injector.get(String));
 		}
@@ -309,7 +528,9 @@ var FolderComponent = (function () {
 			termsLogic: termsLogic
 		});
 
+		// Deprecated
 		this.terms = this.termsLogic.terms;
+
 		this.immTerms = this.termsLogic._terms;
 		this.termsLogic.termsChanged.subscribe(function (newTerms) {
 			_this.terms = _this.termsLogic.terms;
@@ -336,17 +557,17 @@ var FolderComponent = (function () {
 	return FolderComponent;
 })();
 
-FolderComponent.parameters = [new ng.core.Inject(_injectorsLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectorsTermsLogicJs.TermsLogic)];
+FolderComponent.parameters = [new ng.core.Inject(_injectablesLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic)];
 _a2['default'].Component({
 	templateUrl: '/app/folder.tmpl',
 	pipes: [_folderLengthPipeJs.LengthPipe, _termDisplayTermPipeJs.DisplayTermPipe, _folderContainsPipeJs.ContainsPipe, _folderGeneralizeFolderPipeJs.GeneralizeFolderPipe],
-	directives: [_termTermComponentJs.TermComponent, _directivesFloatingSpanJs.FloatingSpan]
+	directives: [_termTermComponentJs.TermComponent, _directivesFloatingSpanJs.FloatingSpan, _studyStudyComponentJs.StudyComponent, _directivesTagsInputJs.TagsInput]
 })['for'](FolderComponent);
 
 exports['default'] = { FolderComponent: FolderComponent };
 module.exports = exports['default'];
 
-},{"../directives/floating-span.js":2,"../folder/contains-pipe.js":4,"../folder/generalize-folder-pipe.js":6,"../folder/length-pipe.js":7,"../injectors/local-storage-management.js":8,"../injectors/terms-logic.js":10,"../term/display-term-pipe.js":11,"../term/term.component.js":12,"a":"a"}],6:[function(require,module,exports){
+},{"../directives/floating-span.js":2,"../directives/tags-input.js":3,"../folder/contains.pipe.js":6,"../folder/generalize-folder.pipe.js":8,"../folder/length.pipe.js":9,"../injectables/local-storage-management.js":10,"../injectables/terms-logic.js":12,"../study/study.component.js":13,"../term/display-term.pipe.js":14,"../term/term.component.js":15,"a":"a"}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -379,7 +600,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { GeneralizeFolderPipe: GeneralizeFolderPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],7:[function(require,module,exports){
+},{"../a.js":"a"}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -398,7 +619,7 @@ var LengthPipe = (function () {
 	}
 
 	LengthPipe.prototype.transform = function transform(value, args) {
-		return value.length;
+		return value.size || value.length;
 	};
 
 	return LengthPipe;
@@ -410,7 +631,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { LengthPipe: LengthPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],8:[function(require,module,exports){
+},{"../a.js":"a"}],10:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -456,7 +677,7 @@ _aJs2["default"].Injectable()["for"](LocalStorageManagement);
 exports["default"] = { LocalStorageManagement: LocalStorageManagement };
 module.exports = exports["default"];
 
-},{"../a.js":"a"}],9:[function(require,module,exports){
+},{"../a.js":"a"}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -557,10 +778,12 @@ _a2['default'].Injectable()['for'](TermsLogicMock);
 exports['default'] = { TermsLogicMock: TermsLogicMock };
 module.exports = exports['default'];
 
-},{"a":"a"}],10:[function(require,module,exports){
+},{"a":"a"}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -600,7 +823,7 @@ var TermsLogic = (function () {
 	}
 
 	TermsLogic.prototype.addTerm = function addTerm(newTerm) {
-		this._terms = this._terms.push(Immutable.fromJS(newTerm));
+		this._terms = this._terms.push(Immutable.fromJS(_extends({ id: this.guid() }, newTerm)));
 		this.onTermsChange();
 	};
 
@@ -615,17 +838,37 @@ var TermsLogic = (function () {
 		this.updateTermByIndex(index, mergeValue);
 	};
 
+	TermsLogic.prototype.updateTermById = function updateTermById(id, mergeValue) {
+		var _terms$findEntry2 = this._terms.findEntry(function (term) {
+			return term.get('id') == id;
+		});
+
+		var index = _terms$findEntry2[0];
+
+		this.updateTermByIndex(index, mergeValue);
+	};
+
 	TermsLogic.prototype.updateTermByIndex = function updateTermByIndex(index, mergeValue) {
 		this._terms = this._terms.mergeIn([index], mergeValue);
 		this.onTermsChange();
 	};
 
 	TermsLogic.prototype.deleteTermByValue = function deleteTermByValue(term) {
-		var _terms$findEntry2 = this._terms.findEntry(function (value, key) {
+		var _terms$findEntry3 = this._terms.findEntry(function (value, key) {
 			return Immutable.is(Immutable.fromJS(term), value);
 		});
 
-		var index = _terms$findEntry2[0];
+		var index = _terms$findEntry3[0];
+
+		this.deleteTermByIndex(index);
+	};
+
+	TermsLogic.prototype.deleteTermById = function deleteTermById(id) {
+		var _terms$findEntry4 = this._terms.findEntry(function (term) {
+			return term.get('id') == id;
+		});
+
+		var index = _terms$findEntry4[0];
 
 		this.deleteTermByIndex(index);
 	};
@@ -638,6 +881,13 @@ var TermsLogic = (function () {
 	TermsLogic.prototype.onTermsChange = function onTermsChange() {
 		this.termsLSUpdater();
 		this.termsChanged.emit(this._terms.toJS());
+	};
+
+	TermsLogic.prototype.guid = function guid() {
+		function s4() {
+			return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+		}
+		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	};
 
 	_createClass(TermsLogic, [{
@@ -660,7 +910,84 @@ _a2['default'].Injectable()['for'](TermsLogic);
 exports['default'] = { TermsLogic: TermsLogic };
 module.exports = exports['default'];
 
-},{"./local-storage-management.js":8,"a":"a"}],11:[function(require,module,exports){
+},{"./local-storage-management.js":10,"a":"a"}],13:[function(require,module,exports){
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _a = require('a');
+
+var _a2 = _interopRequireDefault(_a);
+
+var _injectablesTermsLogicJs = require('../injectables/terms-logic.js');
+
+var StudyComponent = (function () {
+	function StudyComponent(termsLogic, studyScheme) {
+		var _this = this;
+
+		_classCallCheck(this, StudyComponent);
+
+		_.assign(this, {
+			termsLogic: termsLogic,
+			studyScheme: studyScheme,
+			// Local properties
+			showCorrectAnswer: false
+		});
+
+		this.studyLogic = this.studyScheme(this.termsLogic._terms.toJSON());
+		this.currentTerm = this.studyLogic.currentTerm;
+
+		this.studyLogic.learnTermEvent.subscribe(function (term) {
+			_this.termsLogic.updateTermById(term.id, {
+				point: term.point + 1
+			});
+		});
+	}
+
+	// ngOnInit() {
+	// }
+
+	StudyComponent.prototype.onSubmit = function onSubmit($event) {
+		$event.preventDefault();
+
+		if (this.showCorrectAnswer) {
+			this.showCorrectAnswer = false;
+			this.studyLogic.next();
+			this.currentTerm = this.studyLogic.currentTerm;
+		} else {
+			var result = this.studyLogic.checkAndUpdate({
+				id: this.currentTerm.id,
+				field: 'meaning',
+				answer: $event.target.answer.value
+			});
+			console.log('result: ', result);
+			this.showCorrectAnswer = true;
+		}
+		$event.target.reset();
+		console.log(this.studyLogic.currentTermIndex, this.studyLogic.currentGroupIndex);
+	};
+
+	StudyComponent.prototype.reset = function reset() {
+		this.studyLogic.reset();
+		this.currentTerm = this.studyLogic.currentTerm;
+	};
+
+	return StudyComponent;
+})();
+
+StudyComponent.parameters = [new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic), new ng.core.Inject('studyScheme')];
+_a2['default'].Component({
+	selector: 'study',
+	templateUrl: '/app/study'
+})['for'](StudyComponent);
+exports['default'] = { StudyComponent: StudyComponent };
+module.exports = exports['default'];
+
+},{"../injectables/terms-logic.js":12,"a":"a"}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -694,7 +1021,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { DisplayTermPipe: DisplayTermPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],12:[function(require,module,exports){
+},{"../a.js":"a"}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -707,50 +1034,53 @@ var _aJs = require('../a.js');
 
 var _aJs2 = _interopRequireDefault(_aJs);
 
-var _termDisplayTermPipeJs = require('../term/display-term-pipe.js');
+var _termDisplayTermPipeJs = require('../term/display-term.pipe.js');
 
-var _injectorsTermsLogicJs = require('../injectors/terms-logic.js');
+var _injectablesTermsLogicJs = require('../injectables/terms-logic.js');
 
 var TermComponent = (function () {
 	function TermComponent(termsLogic) {
 		_classCallCheck(this, TermComponent);
 
 		_.assign(this, {
-			termsLogic: termsLogic
+			termsLogic: termsLogic,
+			// Public variables initialization
+			editing: false
 		});
 	}
 
 	TermComponent.prototype.updateTerm = function updateTerm(wordInput, meaningInput) {
-		// console.log(wordInput.value, meaningInput.value);
-		this.termsLogic.updateTermByValue(this.term, {
+		// console.log(wordInput, meaningInput);
+		this.termsLogic.updateTermById(this.term.get('id'), {
 			word: wordInput.value,
 			meaning: meaningInput.value
 		});
-		// this.termChange.emit(this.term);
 	};
 
 	TermComponent.prototype.learnTerm = function learnTerm() {
-		// this.term = {...this.term, point: this.term.point + 1};
-		this.termsLogic.updateTermByValue(this.term, {
+		this.termsLogic.updateTermById(this.term.get('id'), {
 			point: this.term.get('point') + 1
 		});
-		// this.termChange.emit(this.term);
 	};
 
 	TermComponent.prototype.deleteTerm = function deleteTerm() {
 		this.termsLogic.deleteTermByValue(this.term);
 	};
 
-	//
-
-	TermComponent.prototype.ngOnChanges = function ngOnChanges(changes) {
-		console.log(changes);
-	};
-
+	// //
+	// ngOnChanges(changes) {
+	// 	console.log('Term: ngOnChanges', changes)
+	// }
+	// ngOnInit() {
+	// 	console.log('Term: ngOnInit');
+	// }
+	// ngOnDestroy() {
+	// 	console.log('Term: ngOnDestroy');
+	// }
 	return TermComponent;
 })();
 
-TermComponent.parameters = [new ng.core.Inject(_injectorsTermsLogicJs.TermsLogic)];
+TermComponent.parameters = [new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic)];
 _aJs2['default'].Component({
 	selector: 'term',
 	pipes: [_termDisplayTermPipeJs.DisplayTermPipe],
@@ -762,7 +1092,7 @@ exports['default'] = { TermComponent: TermComponent };
 module.exports = exports['default'];
 // changeDetection: ng.core.ChangeDetectionStrategy.OnPush
 
-},{"../a.js":"a","../injectors/terms-logic.js":10,"../term/display-term-pipe.js":11}],"a":[function(require,module,exports){
+},{"../a.js":"a","../injectables/terms-logic.js":12,"../term/display-term.pipe.js":14}],"a":[function(require,module,exports){
 'use strict';
 
 var _createAnnotator = createAnnotator();

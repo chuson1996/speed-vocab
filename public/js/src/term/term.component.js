@@ -1,36 +1,41 @@
 import a from '../a.js';
-import {DisplayTermPipe} from '../term/display-term-pipe.js';
-import {TermsLogic} from '../injectors/terms-logic.js';
+import {DisplayTermPipe} from '../term/display-term.pipe.js';
+import {TermsLogic} from '../injectables/terms-logic.js';
 
 
 class TermComponent {
 	constructor(termsLogic) {
 		_.assign(this, {
-			termsLogic
+			termsLogic,
+			// Public variables initialization
+			editing: false
 		});
 	}
 	updateTerm (wordInput, meaningInput) {
-		// console.log(wordInput.value, meaningInput.value);
-		this.termsLogic.updateTermByValue(this.term, {
+		// console.log(wordInput, meaningInput);
+		this.termsLogic.updateTermById(this.term.get('id'), {
 			word: wordInput.value, 
 			meaning: meaningInput.value
 		});
-		// this.termChange.emit(this.term);
 	}
 	learnTerm () {
-		// this.term = {...this.term, point: this.term.point + 1};
-		this.termsLogic.updateTermByValue(this.term, {
+		this.termsLogic.updateTermById(this.term.get('id'), {
 			point: this.term.get('point') + 1
 		});
-		// this.termChange.emit(this.term);
 	}
 	deleteTerm() {
 		this.termsLogic.deleteTermByValue(this.term);
 	}
-	//
-	ngOnChanges(changes) {
-		console.log(changes)
-	}
+	// //
+	// ngOnChanges(changes) {
+	// 	console.log('Term: ngOnChanges', changes)
+	// }
+	// ngOnInit() {
+	// 	console.log('Term: ngOnInit');
+	// }
+	// ngOnDestroy() {
+	// 	console.log('Term: ngOnDestroy');
+	// }
 }
 TermComponent.parameters = [
 	new ng.core.Inject(TermsLogic)
