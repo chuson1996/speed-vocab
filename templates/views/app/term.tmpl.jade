@@ -1,11 +1,11 @@
 | {{value}}
 div([style.display]="editing ? 'block': 'none' ")
-	input.form-control(type='text', [value]="term.get('word')", #wordInput="", (input)="0")
-	input.form-control(type='text', [value]="term.get('meaning')", #meaningInput="", (input)="0")
+	input.form-control(type='text', [value]="term.get('word')", #wordInput="")
+	input.form-control(type='text', [value]="term.get('meaning')", #meaningInput="")
 
-.col-sm-6
+.col-sm-12
 	| {{ term | displayTerm }}
-.col-sm-6
+.col-sm-12
 	button.btn.btn-primary((click)="editing = true", *ngIf="!editing") Edit
 	button.btn.btn-primary((click)="updateTerm(wordInput, meaningInput)", *ngIf="editing") Update
 	button.btn.btn-warning((click)="learnTerm()") Learn

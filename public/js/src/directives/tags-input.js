@@ -6,19 +6,40 @@ class TagsInput {
 			elementRef
 		})
 
-		this.onChange = new ng.core.EventEmitter();
+		this.onTagChanged = new ng.core.EventEmitter();
 		this.onTagAdded = new ng.core.EventEmitter();
 		this.onTagRemoved = new ng.core.EventEmitter();
 
 		this.elem = this.elementRef.nativeElement;
-		console.log(this.elem);
 	}
 	ngAfterViewInit() {
 		console.log('ngAfterViewInit');
+		this.integrateNgForm();
+	}
+	integrateNgForm () {
+		setTimeout(() => {
+			this.tagsInputControlName.control.valueChanges.subscribe((value) => {
+				$(this.elem).importTags(value);
+			});
+		});
+
+		
+		let onChange = (() => {
+			let oldVal;
+			return () => {
+				let newVal = $(this.elem).val();
+				if (oldVal !== newVal) {
+					oldVal = newVal;
+					this.tagsInputControlName.control.updateValue(newVal, {emitEvent: false});
+					this.onTagChanged.emit(newVal);
+				}
+			}
+		})();
 		$(this.elem).tagsInput({
-			onAddTag: (event) => this.onTagAdded.emit(event),
-			onTagRemoved: (event) => this.onTagRemoved.emit(event),
-			onChange: (event) => this.onChange.emit(event),
+			onAddTag: onChange,
+			onRemoveTag: onChange,
+			// onChange: () => {
+			// },
 			delimiter: ','
 		});
 	}
@@ -28,7 +49,8 @@ TagsInput.parameters = [
 ];
 a.Directive({
 	selector: '[tags-input]',
-	outputs: ['onChange', 'onTagAdded', 'onTagRemoved']
+	outputs: ['onTagChanged', 'onTagAdded', 'onTagRemoved'],
+	inputs: ['tagsInputControlName: tags-input-control-name']
 }).for(TagsInput);
 
 export default { TagsInput };

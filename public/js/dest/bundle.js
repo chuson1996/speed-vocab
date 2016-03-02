@@ -66,7 +66,7 @@ _a2['default'].RouteConfig([{ path: '/folder', name: 'Folder', component: _folde
 
 ng.platform.browser.bootstrap(AppComponent);
 
-},{"./directives/floating-span.js":2,"./directives/tags-input.js":3,"./factories/get-text-bounding-rect.js":4,"./factories/study-scheme.js":5,"./folder/contains.pipe.js":6,"./folder/folder.component.js":7,"./folder/generalize-folder.pipe.js":8,"./folder/length.pipe.js":9,"./injectables/local-storage-management.js":10,"./injectables/terms-logic-mock.js":11,"./injectables/terms-logic.js":12,"./study/study.component.js":13,"./term/display-term.pipe.js":14,"./term/term.component.js":15,"a":"a"}],2:[function(require,module,exports){
+},{"./directives/floating-span.js":2,"./directives/tags-input.js":3,"./factories/get-text-bounding-rect.js":4,"./factories/study-scheme.js":5,"./folder/contains.pipe.js":6,"./folder/folder.component.js":7,"./folder/generalize-folder.pipe.js":8,"./folder/length.pipe.js":9,"./injectables/local-storage-management.js":11,"./injectables/terms-logic-mock.js":12,"./injectables/terms-logic.js":13,"./study/study.component.js":14,"./term/display-term.pipe.js":15,"./term/term.component.js":16,"a":"a"}],2:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -149,28 +149,43 @@ var TagsInput = (function () {
 			elementRef: elementRef
 		});
 
-		this.onChange = new ng.core.EventEmitter();
+		this.onTagChanged = new ng.core.EventEmitter();
 		this.onTagAdded = new ng.core.EventEmitter();
 		this.onTagRemoved = new ng.core.EventEmitter();
 
 		this.elem = this.elementRef.nativeElement;
-		console.log(this.elem);
 	}
 
 	TagsInput.prototype.ngAfterViewInit = function ngAfterViewInit() {
+		console.log('ngAfterViewInit');
+		this.integrateNgForm();
+	};
+
+	TagsInput.prototype.integrateNgForm = function integrateNgForm() {
 		var _this = this;
 
-		console.log('ngAfterViewInit');
+		setTimeout(function () {
+			_this.tagsInputControlName.control.valueChanges.subscribe(function (value) {
+				$(_this.elem).importTags(value);
+			});
+		});
+
+		var onChange = (function () {
+			var oldVal = undefined;
+			return function () {
+				var newVal = $(_this.elem).val();
+				if (oldVal !== newVal) {
+					oldVal = newVal;
+					_this.tagsInputControlName.control.updateValue(newVal, { emitEvent: false });
+					_this.onTagChanged.emit(newVal);
+				}
+			};
+		})();
 		$(this.elem).tagsInput({
-			onAddTag: function onAddTag(event) {
-				return _this.onTagAdded.emit(event);
-			},
-			onTagRemoved: function onTagRemoved(event) {
-				return _this.onTagRemoved.emit(event);
-			},
-			onChange: function onChange(event) {
-				return _this.onChange.emit(event);
-			},
+			onAddTag: onChange,
+			onRemoveTag: onChange,
+			// onChange: () => {
+			// },
 			delimiter: ','
 		});
 	};
@@ -181,7 +196,8 @@ var TagsInput = (function () {
 TagsInput.parameters = [new ng.core.Inject(ng.core.ElementRef)];
 _a2['default'].Directive({
 	selector: '[tags-input]',
-	outputs: ['onChange', 'onTagAdded', 'onTagRemoved']
+	outputs: ['onTagChanged', 'onTagAdded', 'onTagRemoved'],
+	inputs: ['tagsInputControlName: tags-input-control-name']
 })['for'](TagsInput);
 
 exports['default'] = { TagsInput: TagsInput };
@@ -511,6 +527,8 @@ var _directivesTagsInputJs = require('../directives/tags-input.js');
 
 var _studyStudyComponentJs = require('../study/study.component.js');
 
+var _folderSearchByTagPipeJs = require('../folder/search-by-tag.pipe.js');
+
 var FolderComponent = (function () {
 	function FolderComponent(localStorageManagement, termsLogic) {
 		var _this = this;
@@ -538,20 +556,43 @@ var FolderComponent = (function () {
 		});
 	}
 
-	FolderComponent.prototype.clearForm = function clearForm(newTermForm) {
-		newTermForm.reset();
-	};
+	FolderComponent.prototype.submit = function submit(ngForm) {
+		var _ngForm$value = ngForm.value;
+		var word = _ngForm$value.word;
+		var meaning = _ngForm$value.meaning;
+		var tags = _ngForm$value.tags;
 
-	FolderComponent.prototype.submit = function submit($event) {
-		$event.preventDefault();
-		var newTermForm = $event.target;
 		this.termsLogic.addTerm({
-			word: newTermForm.word.value,
-			meaning: newTermForm.meaning.value,
+			word: word, meaning: meaning, tags: tags,
 			point: 0
 		});
 
-		this.clearForm(newTermForm);
+		this.clearForm(ngForm);
+	};
+
+	FolderComponent.prototype.log = function log(text) {
+		console.log(text);
+	};
+
+	FolderComponent.prototype.clearForm = function clearForm(ngForm) {
+		console.log(ngForm);
+		var controls = ngForm.controls;
+		for (var _iterator = _.keys(controls), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+			var _ref;
+
+			if (_isArray) {
+				if (_i >= _iterator.length) break;
+				_ref = _iterator[_i++];
+			} else {
+				_i = _iterator.next();
+				if (_i.done) break;
+				_ref = _i.value;
+			}
+
+			var field = _ref;
+
+			controls[field].updateValue('');
+		}
 	};
 
 	return FolderComponent;
@@ -560,14 +601,14 @@ var FolderComponent = (function () {
 FolderComponent.parameters = [new ng.core.Inject(_injectablesLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic)];
 _a2['default'].Component({
 	templateUrl: '/app/folder.tmpl',
-	pipes: [_folderLengthPipeJs.LengthPipe, _termDisplayTermPipeJs.DisplayTermPipe, _folderContainsPipeJs.ContainsPipe, _folderGeneralizeFolderPipeJs.GeneralizeFolderPipe],
+	pipes: [_folderLengthPipeJs.LengthPipe, _termDisplayTermPipeJs.DisplayTermPipe, _folderContainsPipeJs.ContainsPipe, _folderGeneralizeFolderPipeJs.GeneralizeFolderPipe, _folderSearchByTagPipeJs.SearchByTagPipe],
 	directives: [_termTermComponentJs.TermComponent, _directivesFloatingSpanJs.FloatingSpan, _studyStudyComponentJs.StudyComponent, _directivesTagsInputJs.TagsInput]
 })['for'](FolderComponent);
 
 exports['default'] = { FolderComponent: FolderComponent };
 module.exports = exports['default'];
 
-},{"../directives/floating-span.js":2,"../directives/tags-input.js":3,"../folder/contains.pipe.js":6,"../folder/generalize-folder.pipe.js":8,"../folder/length.pipe.js":9,"../injectables/local-storage-management.js":10,"../injectables/terms-logic.js":12,"../study/study.component.js":13,"../term/display-term.pipe.js":14,"../term/term.component.js":15,"a":"a"}],8:[function(require,module,exports){
+},{"../directives/floating-span.js":2,"../directives/tags-input.js":3,"../folder/contains.pipe.js":6,"../folder/generalize-folder.pipe.js":8,"../folder/length.pipe.js":9,"../folder/search-by-tag.pipe.js":10,"../injectables/local-storage-management.js":11,"../injectables/terms-logic.js":13,"../study/study.component.js":14,"../term/display-term.pipe.js":15,"../term/term.component.js":16,"a":"a"}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -632,6 +673,43 @@ exports['default'] = { LengthPipe: LengthPipe };
 module.exports = exports['default'];
 
 },{"../a.js":"a"}],10:[function(require,module,exports){
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _a = require('a');
+
+var _a2 = _interopRequireDefault(_a);
+
+var SearchByTagPipe = (function () {
+	function SearchByTagPipe() {
+		_classCallCheck(this, SearchByTagPipe);
+	}
+
+	SearchByTagPipe.prototype.transform = function transform(value, _ref) {
+		var keyTags = _ref[0];
+
+		return value.filter(function (term) {
+			return _.every(keyTags.split(','), function (keyTag) {
+				return term.get('tags').includes(keyTag.trim());
+			});
+		});
+	};
+
+	return SearchByTagPipe;
+})();
+
+_a2['default'].Pipe({
+	name: 'searchByTag'
+})['for'](SearchByTagPipe);
+exports['default'] = { SearchByTagPipe: SearchByTagPipe };
+module.exports = exports['default'];
+
+},{"a":"a"}],11:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -677,7 +755,7 @@ _aJs2["default"].Injectable()["for"](LocalStorageManagement);
 exports["default"] = { LocalStorageManagement: LocalStorageManagement };
 module.exports = exports["default"];
 
-},{"../a.js":"a"}],11:[function(require,module,exports){
+},{"../a.js":"a"}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -778,7 +856,7 @@ _a2['default'].Injectable()['for'](TermsLogicMock);
 exports['default'] = { TermsLogicMock: TermsLogicMock };
 module.exports = exports['default'];
 
-},{"a":"a"}],12:[function(require,module,exports){
+},{"a":"a"}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -910,7 +988,7 @@ _a2['default'].Injectable()['for'](TermsLogic);
 exports['default'] = { TermsLogic: TermsLogic };
 module.exports = exports['default'];
 
-},{"./local-storage-management.js":10,"a":"a"}],13:[function(require,module,exports){
+},{"./local-storage-management.js":11,"a":"a"}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -987,7 +1065,7 @@ _a2['default'].Component({
 exports['default'] = { StudyComponent: StudyComponent };
 module.exports = exports['default'];
 
-},{"../injectables/terms-logic.js":12,"a":"a"}],14:[function(require,module,exports){
+},{"../injectables/terms-logic.js":13,"a":"a"}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1009,7 +1087,7 @@ var DisplayTermPipe = (function () {
 		// return `${val.word} is ${val.meaning}. Point: ${val.point}`;
 
 		// Immutable.js
-		return val.get('word') + ' is ' + val.get('meaning') + '. Point: ' + val.get('point');
+		return val.get('word') + ' is ' + val.get('meaning') + '. Point: ' + val.get('point') + '. Tags: ' + val.get('tags');
 	};
 
 	return DisplayTermPipe;
@@ -1021,7 +1099,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { DisplayTermPipe: DisplayTermPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],15:[function(require,module,exports){
+},{"../a.js":"a"}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1092,7 +1170,7 @@ exports['default'] = { TermComponent: TermComponent };
 module.exports = exports['default'];
 // changeDetection: ng.core.ChangeDetectionStrategy.OnPush
 
-},{"../a.js":"a","../injectables/terms-logic.js":12,"../term/display-term.pipe.js":14}],"a":[function(require,module,exports){
+},{"../a.js":"a","../injectables/terms-logic.js":13,"../term/display-term.pipe.js":15}],"a":[function(require,module,exports){
 'use strict';
 
 var _createAnnotator = createAnnotator();

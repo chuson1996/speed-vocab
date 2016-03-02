@@ -10,6 +10,7 @@ import { TermComponent } from '../term/term.component.js';
 import { FloatingSpan } from '../directives/floating-span.js';
 import { TagsInput } from '../directives/tags-input.js';
 import { StudyComponent } from '../study/study.component.js';
+import { SearchByTagPipe } from '../folder/search-by-tag.pipe.js';
 
 class FolderComponent {
 	constructor(localStorageManagement, termsLogic) {
@@ -39,19 +40,24 @@ class FolderComponent {
 			this.immTerms = this.termsLogic._terms;
 		});
 	}
-	clearForm(newTermForm) {
-		newTermForm.reset();
-	}
-	submit($event) {
-		$event.preventDefault();
-		let newTermForm = $event.target;
+	submit(ngForm) {
+		let {word, meaning, tags} = ngForm.value;
 		this.termsLogic.addTerm({
-			word: newTermForm.word.value,
-			meaning: newTermForm.meaning.value,
+			word, meaning, tags,
 			point: 0
 		});
 
-		this.clearForm(newTermForm);
+		this.clearForm(ngForm);
+	}
+	log (text) {
+		console.log(text);
+	}
+	clearForm (ngForm) {
+		console.log(ngForm);
+		let controls = ngForm.controls;
+		for (let field of _.keys(controls)) {
+			controls[field].updateValue('');
+		}
 	}
 }
 FolderComponent.parameters = [
@@ -60,7 +66,8 @@ FolderComponent.parameters = [
 ];
 a.Component({
 	templateUrl: '/app/folder.tmpl',
-	pipes: [LengthPipe, DisplayTermPipe, ContainsPipe, GeneralizeFolderPipe],
+	pipes: [LengthPipe, DisplayTermPipe, ContainsPipe, GeneralizeFolderPipe,
+		SearchByTagPipe],
 	directives: [TermComponent, FloatingSpan, StudyComponent, TagsInput],
 }).for(FolderComponent);
 

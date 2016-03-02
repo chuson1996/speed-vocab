@@ -1,27 +1,26 @@
 .row
 	.col-sm-6
-		form.form-group((submit)="submit($event)", #newTermForm="ngForm")
+		form.form-group((ngSubmit)="submit(f)", #f="ngForm")
 			label.label-control Word
 			//- div
-			input.form-control(type='text', name="word", placeholder="Enter a word:", required, ngControl="word", #word="ngForm")
-			span([hidden]="word.valid || word.untouched") Please enter a word
+			input.form-control(type='text', name="word", placeholder="Enter a word:", required, ngControl="word")
 			br
 			label.label-control Meaning
-			input.form-control(type='text', placeholder="Now enter its meaning", name="meaning", ngControl="meaning", #meaning="ngForm", required)
-			span([hidden]="meaning.valid || meaning.untouched") Please its meaning too
+			input.form-control(type='text', placeholder="Now enter its meaning", name="meaning", ngControl="meaning", required)
 			br
 			label.label-control Image References
-			input(name="tags", tags-input="")
+			input(name="tags", tags-input, [tags-input-control-name]="tags", ngControl="tags", #tags="ngForm")
 			//- input.
 			br
-			button.btn.btn-success(type="submit", [disabled]="!newTermForm.valid") Submit
-		input.form-control(placeholder="Type of search key", #key="", type="text", (input)) 
-		br
+			button.btn.btn-success(type="submit", [disabled]="!f.valid") Submit
+		input.form-control(placeholder="Type search key", #key="", type="text", (input))
+		input.form-control(placeholder="Type tag search key", #tagKey="", type="text", (input))
+	.col-sm-6
 		h2 Filter for terms containing "{{key.value}}"
 
 		//- div(*ngFor="#term of terms | contains:key.value")
 		//- 	term([term]="term")
-		div(*ngFor="#immTerm of immTerms | contains:key.value")
+		div(*ngFor="#immTerm of immTerms | contains:key.value | searchByTag:tagKey.value ")
 			term([term]="immTerm")
 
 		//- br
