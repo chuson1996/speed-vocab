@@ -59,14 +59,14 @@ _a2['default'].RouteConfig([{ path: '/folder', name: 'Folder', component: _folde
 	selector: 'app',
 	providers: [_injectablesLocalStorageManagementJs.LocalStorageManagement, ng.core.provide(_injectablesTermsLogicJs.TermsLogic, { useClass: _injectablesTermsLogicJs.TermsLogic }), ng.core.ElementRef, ng.core.provide('getTextBoundingRect', { useFactory: function useFactory() {
 			return _factoriesGetTextBoundingRectJs.getTextBoundingRect;
-		} }), ng.router.ROUTER_PROVIDERS, ng.core.provide(ng.router.LocationStrategy, { useClass: ng.router.HashLocationStrategy }), ng.core.provide('studyScheme', { useFactory: _factoriesStudySchemeJs.studyScheme }), _directivesTagsInputJs.TagsInput],
+		} }), ng.router.ROUTER_PROVIDERS, ng.core.provide(ng.router.LocationStrategy, { useClass: ng.router.HashLocationStrategy }), ng.core.provide('studyScheme', { useFactory: _factoriesStudySchemeJs.studyScheme }), _directivesTagsInputJs.TagsInput, ng.http.HTTP_PROVIDERS],
 	directives: [ng.router.RouterOutlet, ng.router.RouterLink]
 
 })['for'](AppComponent);
 
 ng.platform.browser.bootstrap(AppComponent);
 
-},{"./directives/floating-span.js":2,"./directives/tags-input.js":3,"./factories/get-text-bounding-rect.js":4,"./factories/study-scheme.js":5,"./folder/contains.pipe.js":6,"./folder/folder.component.js":7,"./folder/generalize-folder.pipe.js":8,"./folder/length.pipe.js":9,"./injectables/local-storage-management.js":11,"./injectables/terms-logic-mock.js":12,"./injectables/terms-logic.js":13,"./study/study.component.js":14,"./term/display-term.pipe.js":15,"./term/term.component.js":16,"a":"a"}],2:[function(require,module,exports){
+},{"./directives/floating-span.js":2,"./directives/tags-input.js":4,"./factories/get-text-bounding-rect.js":5,"./factories/study-scheme.js":6,"./folder/contains.pipe.js":7,"./folder/folder.component.js":8,"./folder/generalize-folder.pipe.js":9,"./folder/length.pipe.js":10,"./injectables/local-storage-management.js":12,"./injectables/terms-logic-mock.js":13,"./injectables/terms-logic.js":14,"./study/study.component.js":15,"./term/display-term.pipe.js":16,"./term/term.component.js":17,"a":"a"}],2:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -141,6 +141,74 @@ var _a = require('a');
 
 var _a2 = _interopRequireDefault(_a);
 
+var ImageTag = (function () {
+	function ImageTag(http) {
+		_classCallCheck(this, ImageTag);
+
+		_.assign(this, {
+			http: http
+		});
+		this.imageGroups = [];
+	}
+
+	ImageTag.prototype.ngOnChanges = function ngOnChanges(changes) {
+		var _this = this;
+
+		if (this.tags) {
+			var _changes$tags = changes.tags;
+			var currentValue = _changes$tags.currentValue;
+			var previousValue = _changes$tags.previousValue;
+
+			// Add tag
+			if (!previousValue || currentValue.split(',').length > previousValue.split(',').length) {
+				this.http.get('http://localhost:8080/api/crawle-google-image/' + _.last(currentValue.split(','))).map(function (data) {
+					return data.json();
+				}).map(function (images) {
+					return {
+						images: images,
+						index: 0
+					};
+				}).subscribe(function (imageGroup) {
+					_this.imageGroups.push(imageGroup);
+				});
+			} else {
+				// Remove tag
+				this.imageGroups = _.dropRight(this.imageGroups);
+			}
+		} else {
+			this.imageGroups = [];
+		}
+	};
+
+	ImageTag.prototype.nextImage = function nextImage(imageGroup) {
+		imageGroup.index = (imageGroup.index + 1) % imageGroup.images.length;
+	};
+
+	return ImageTag;
+})();
+
+ImageTag.parameters = [new ng.core.Inject(ng.http.Http)];
+_a2['default'].Component({
+	selector: 'image-tag',
+	inputs: ['tags'],
+	templateUrl: '/app/image-tag.tmpl'
+})['for'](ImageTag);
+exports['default'] = { ImageTag: ImageTag };
+module.exports = exports['default'];
+
+},{"a":"a"}],4:[function(require,module,exports){
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _a = require('a');
+
+var _a2 = _interopRequireDefault(_a);
+
 var TagsInput = (function () {
 	function TagsInput(elementRef) {
 		_classCallCheck(this, TagsInput);
@@ -203,7 +271,7 @@ _a2['default'].Directive({
 exports['default'] = { TagsInput: TagsInput };
 module.exports = exports['default'];
 
-},{"a":"a"}],4:[function(require,module,exports){
+},{"a":"a"}],5:[function(require,module,exports){
 // Solution from http://stackoverflow.com/questions/6930578/get-cursor-or-text-position-in-pixels-for-input-element
 "use strict";
 
@@ -310,7 +378,7 @@ function getTextBoundingRect(input, selectionStart, selectionEnd, debug) {
 	}
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -459,7 +527,7 @@ function studyScheme() {
 	};
 }
 
-},{"a":"a"}],6:[function(require,module,exports){
+},{"a":"a"}],7:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -494,7 +562,7 @@ exports['default'] = { ContainsPipe: ContainsPipe };
 module.exports = exports['default'];
 // pure: false
 
-},{"a":"a"}],7:[function(require,module,exports){
+},{"a":"a"}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -525,12 +593,14 @@ var _directivesFloatingSpanJs = require('../directives/floating-span.js');
 
 var _directivesTagsInputJs = require('../directives/tags-input.js');
 
+var _directivesImageTagJs = require('../directives/image-tag.js');
+
 var _studyStudyComponentJs = require('../study/study.component.js');
 
 var _folderSearchByTagPipeJs = require('../folder/search-by-tag.pipe.js');
 
 var FolderComponent = (function () {
-	function FolderComponent(localStorageManagement, termsLogic) {
+	function FolderComponent(localStorageManagement, termsLogic, http) {
 		var _this = this;
 
 		_classCallCheck(this, FolderComponent);
@@ -543,7 +613,8 @@ var FolderComponent = (function () {
 
 		_.assign(this, {
 			localStorageManagement: localStorageManagement,
-			termsLogic: termsLogic
+			termsLogic: termsLogic,
+			http: http
 		});
 
 		// Deprecated
@@ -567,14 +638,14 @@ var FolderComponent = (function () {
 			point: 0
 		});
 
-		this.clearForm(ngForm);
+		this.clearNgForm(ngForm);
 	};
 
 	FolderComponent.prototype.log = function log(text) {
 		console.log(text);
 	};
 
-	FolderComponent.prototype.clearForm = function clearForm(ngForm) {
+	FolderComponent.prototype.clearNgForm = function clearNgForm(ngForm) {
 		console.log(ngForm);
 		var controls = ngForm.controls;
 		for (var _iterator = _.keys(controls), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -595,20 +666,33 @@ var FolderComponent = (function () {
 		}
 	};
 
+	FolderComponent.prototype.searchImagesByTags = function searchImagesByTags(tags) {
+		var _this2 = this;
+
+		console.log('Searching for ' + tags);
+		Rx.Observable.from(tags.split(',')).concatMap(function (tag) {
+			return _this2.http.get('http://localhost:8080/api/crawle-google-image/' + tag);
+		}).map(function (data) {
+			return data.json();
+		}).subscribe(function (result) {
+			return console.log(result);
+		});
+	};
+
 	return FolderComponent;
 })();
 
-FolderComponent.parameters = [new ng.core.Inject(_injectablesLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic)];
+FolderComponent.parameters = [new ng.core.Inject(_injectablesLocalStorageManagementJs.LocalStorageManagement), new ng.core.Inject(_injectablesTermsLogicJs.TermsLogic), new ng.core.Inject(ng.http.Http)];
 _a2['default'].Component({
 	templateUrl: '/app/folder.tmpl',
 	pipes: [_folderLengthPipeJs.LengthPipe, _termDisplayTermPipeJs.DisplayTermPipe, _folderContainsPipeJs.ContainsPipe, _folderGeneralizeFolderPipeJs.GeneralizeFolderPipe, _folderSearchByTagPipeJs.SearchByTagPipe],
-	directives: [_termTermComponentJs.TermComponent, _directivesFloatingSpanJs.FloatingSpan, _studyStudyComponentJs.StudyComponent, _directivesTagsInputJs.TagsInput]
+	directives: [_termTermComponentJs.TermComponent, _directivesFloatingSpanJs.FloatingSpan, _studyStudyComponentJs.StudyComponent, _directivesTagsInputJs.TagsInput, _directivesImageTagJs.ImageTag]
 })['for'](FolderComponent);
 
 exports['default'] = { FolderComponent: FolderComponent };
 module.exports = exports['default'];
 
-},{"../directives/floating-span.js":2,"../directives/tags-input.js":3,"../folder/contains.pipe.js":6,"../folder/generalize-folder.pipe.js":8,"../folder/length.pipe.js":9,"../folder/search-by-tag.pipe.js":10,"../injectables/local-storage-management.js":11,"../injectables/terms-logic.js":13,"../study/study.component.js":14,"../term/display-term.pipe.js":15,"../term/term.component.js":16,"a":"a"}],8:[function(require,module,exports){
+},{"../directives/floating-span.js":2,"../directives/image-tag.js":3,"../directives/tags-input.js":4,"../folder/contains.pipe.js":7,"../folder/generalize-folder.pipe.js":9,"../folder/length.pipe.js":10,"../folder/search-by-tag.pipe.js":11,"../injectables/local-storage-management.js":12,"../injectables/terms-logic.js":14,"../study/study.component.js":15,"../term/display-term.pipe.js":16,"../term/term.component.js":17,"a":"a"}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -641,7 +725,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { GeneralizeFolderPipe: GeneralizeFolderPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],9:[function(require,module,exports){
+},{"../a.js":"a"}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -672,7 +756,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { LengthPipe: LengthPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],10:[function(require,module,exports){
+},{"../a.js":"a"}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -709,7 +793,7 @@ _a2['default'].Pipe({
 exports['default'] = { SearchByTagPipe: SearchByTagPipe };
 module.exports = exports['default'];
 
-},{"a":"a"}],11:[function(require,module,exports){
+},{"a":"a"}],12:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -755,7 +839,7 @@ _aJs2["default"].Injectable()["for"](LocalStorageManagement);
 exports["default"] = { LocalStorageManagement: LocalStorageManagement };
 module.exports = exports["default"];
 
-},{"../a.js":"a"}],12:[function(require,module,exports){
+},{"../a.js":"a"}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -856,7 +940,7 @@ _a2['default'].Injectable()['for'](TermsLogicMock);
 exports['default'] = { TermsLogicMock: TermsLogicMock };
 module.exports = exports['default'];
 
-},{"a":"a"}],13:[function(require,module,exports){
+},{"a":"a"}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -988,7 +1072,7 @@ _a2['default'].Injectable()['for'](TermsLogic);
 exports['default'] = { TermsLogic: TermsLogic };
 module.exports = exports['default'];
 
-},{"./local-storage-management.js":11,"a":"a"}],14:[function(require,module,exports){
+},{"./local-storage-management.js":12,"a":"a"}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1065,7 +1149,7 @@ _a2['default'].Component({
 exports['default'] = { StudyComponent: StudyComponent };
 module.exports = exports['default'];
 
-},{"../injectables/terms-logic.js":13,"a":"a"}],15:[function(require,module,exports){
+},{"../injectables/terms-logic.js":14,"a":"a"}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1099,7 +1183,7 @@ _aJs2['default'].Pipe({
 exports['default'] = { DisplayTermPipe: DisplayTermPipe };
 module.exports = exports['default'];
 
-},{"../a.js":"a"}],16:[function(require,module,exports){
+},{"../a.js":"a"}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1170,7 +1254,7 @@ exports['default'] = { TermComponent: TermComponent };
 module.exports = exports['default'];
 // changeDetection: ng.core.ChangeDetectionStrategy.OnPush
 
-},{"../a.js":"a","../injectables/terms-logic.js":13,"../term/display-term.pipe.js":15}],"a":[function(require,module,exports){
+},{"../a.js":"a","../injectables/terms-logic.js":14,"../term/display-term.pipe.js":16}],"a":[function(require,module,exports){
 'use strict';
 
 var _createAnnotator = createAnnotator();

@@ -1,0 +1,3 @@
+div(*ngIf="!!imageGroups && imageGroups.length")
+	div(*ngFor="#imageGroup of imageGroups")
+		img([src]="imageGroup.images[imageGroup.index]", (click)="nextImage(imageGroup)")

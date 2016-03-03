@@ -9,11 +9,12 @@ import { GeneralizeFolderPipe } from '../folder/generalize-folder.pipe.js';
 import { TermComponent } from '../term/term.component.js';
 import { FloatingSpan } from '../directives/floating-span.js';
 import { TagsInput } from '../directives/tags-input.js';
+import { ImageTag } from '../directives/image-tag.js';
 import { StudyComponent } from '../study/study.component.js';
 import { SearchByTagPipe } from '../folder/search-by-tag.pipe.js';
 
 class FolderComponent {
-	constructor(localStorageManagement, termsLogic) {
+	constructor(localStorageManagement, termsLogic, http) {
 		{
 			let injector = ng.core.Injector.resolveAndCreate([
 				ng.core.provide(LocalStorageManagement, { useClass: LocalStorageManagement }),
@@ -27,7 +28,8 @@ class FolderComponent {
 
 		_.assign(this, {
 			localStorageManagement,
-			termsLogic
+			termsLogic,
+			http
 		});
 
 
@@ -47,28 +49,36 @@ class FolderComponent {
 			point: 0
 		});
 
-		this.clearForm(ngForm);
+		this.clearNgForm(ngForm);
 	}
 	log (text) {
 		console.log(text);
 	}
-	clearForm (ngForm) {
+	clearNgForm (ngForm) {
 		console.log(ngForm);
 		let controls = ngForm.controls;
 		for (let field of _.keys(controls)) {
 			controls[field].updateValue('');
 		}
 	}
+	searchImagesByTags(tags) {
+		console.log(`Searching for ${tags}`);
+		Rx.Observable.from(tags.split(','))
+			.concatMap((tag) => this.http.get(`http://localhost:8080/api/crawle-google-image/${tag}`))
+			.map((data) => data.json())
+			.subscribe((result) => console.log(result));
+	}
 }
 FolderComponent.parameters = [
 	new ng.core.Inject(LocalStorageManagement),
 	new ng.core.Inject(TermsLogic),
+	new ng.core.Inject(ng.http.Http)
 ];
 a.Component({
 	templateUrl: '/app/folder.tmpl',
 	pipes: [LengthPipe, DisplayTermPipe, ContainsPipe, GeneralizeFolderPipe,
 		SearchByTagPipe],
-	directives: [TermComponent, FloatingSpan, StudyComponent, TagsInput],
+	directives: [TermComponent, FloatingSpan, StudyComponent, TagsInput, ImageTag],
 }).for(FolderComponent);
 
 export default {FolderComponent};

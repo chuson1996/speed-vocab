@@ -29,7 +29,7 @@ import { studyScheme } from './factories/study-scheme.js';
 
 
 class AppComponent {
-	
+
 }
 AppComponent.parameters = [
 	new ng.core.Inject(LocalStorageManagement),
@@ -37,7 +37,7 @@ AppComponent.parameters = [
 ];
 a
 	.RouteConfig([
-		{ path: '/folder', name: 'Folder', component:  FolderComponent, useAsDefault: true},
+		{ path: '/folder', name: 'Folder', component: FolderComponent, useAsDefault: true },
 		{ path: '/study', name: 'Study', component: StudyComponent }
 	])
 	.Component({
@@ -49,9 +49,10 @@ a
 			ng.core.ElementRef,
 			ng.core.provide('getTextBoundingRect', { useFactory: () => getTextBoundingRect }),
 			ng.router.ROUTER_PROVIDERS,
-			ng.core.provide(ng.router.LocationStrategy, {useClass: ng.router.HashLocationStrategy}),
+			ng.core.provide(ng.router.LocationStrategy, { useClass: ng.router.HashLocationStrategy }),
 			ng.core.provide('studyScheme', { useFactory: studyScheme }),
-			TagsInput
+			TagsInput,
+			ng.http.HTTP_PROVIDERS
 		],
 		directives: [ng.router.RouterOutlet, ng.router.RouterLink],
 
