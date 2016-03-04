@@ -10,15 +10,19 @@ class ImageTag {
 	ngOnChanges(changes) {
 		if (this.tags) {
 			let { currentValue, previousValue } = changes.tags;
+			let currentValueArr = currentValue.split(',');
+			let previousValueArr = !!previousValue ? previousValue.split(',') : [];
 			// Add tag
 			if (!previousValue
-				|| currentValue.split(',').length > previousValue.split(',').length) {
-				this.http.get(`http://localhost:8080/api/crawle-google-image/${_.last(currentValue.split(','))}`)
+				|| currentValueArr.length > previousValueArr.length) {
+				let newTag = _.last(currentValue.split(','));
+				this.http.get(`http://localhost:8080/api/crawle-google-image/${newTag}`)
 					.map((data) => data.json())
 					.map((images) => {
 						return {
 							images,
-							index: 0
+							index: 0,
+							tag: newTag
 						};
 					})
 					.subscribe((imageGroup) => {
@@ -26,7 +30,8 @@ class ImageTag {
 					});
 			} else {
 				// Remove tag
-				this.imageGroups = _.dropRight(this.imageGroups);
+				const toRemoveTag = _.difference(previousValueArr, currentValueArr)[0];
+				_.remove(this.imageGroups, (imageGroup) => imageGroup.tag == toRemoveTag);
 			}
 		} else {
 			this.imageGroups = [];

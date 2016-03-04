@@ -159,21 +159,32 @@ var ImageTag = (function () {
 			var currentValue = _changes$tags.currentValue;
 			var previousValue = _changes$tags.previousValue;
 
+			var currentValueArr = currentValue.split(',');
+			var previousValueArr = !!previousValue ? previousValue.split(',') : [];
 			// Add tag
-			if (!previousValue || currentValue.split(',').length > previousValue.split(',').length) {
-				this.http.get('http://localhost:8080/api/crawle-google-image/' + _.last(currentValue.split(','))).map(function (data) {
-					return data.json();
-				}).map(function (images) {
-					return {
-						images: images,
-						index: 0
-					};
-				}).subscribe(function (imageGroup) {
-					_this.imageGroups.push(imageGroup);
-				});
+			if (!previousValue || currentValueArr.length > previousValueArr.length) {
+				(function () {
+					var newTag = _.last(currentValue.split(','));
+					_this.http.get('http://localhost:8080/api/crawle-google-image/' + newTag).map(function (data) {
+						return data.json();
+					}).map(function (images) {
+						return {
+							images: images,
+							index: 0,
+							tag: newTag
+						};
+					}).subscribe(function (imageGroup) {
+						_this.imageGroups.push(imageGroup);
+					});
+				})();
 			} else {
-				// Remove tag
-				this.imageGroups = _.dropRight(this.imageGroups);
+				(function () {
+					// Remove tag
+					var toRemoveTag = _.difference(previousValueArr, currentValueArr)[0];
+					_.remove(_this.imageGroups, function (imageGroup) {
+						return imageGroup.tag == toRemoveTag;
+					});
+				})();
 			}
 		} else {
 			this.imageGroups = [];
