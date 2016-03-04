@@ -61,13 +61,6 @@ class FolderComponent {
 			controls[field].updateValue('');
 		}
 	}
-	searchImagesByTags(tags) {
-		console.log(`Searching for ${tags}`);
-		Rx.Observable.from(tags.split(','))
-			.concatMap((tag) => this.http.get(`http://localhost:8080/api/crawle-google-image/${tag}`))
-			.map((data) => data.json())
-			.subscribe((result) => console.log(result));
-	}
 }
 FolderComponent.parameters = [
 	new ng.core.Inject(LocalStorageManagement),

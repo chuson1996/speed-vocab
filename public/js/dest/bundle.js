@@ -142,13 +142,19 @@ var _a = require('a');
 var _a2 = _interopRequireDefault(_a);
 
 var ImageTag = (function () {
-	function ImageTag(http) {
+	function ImageTag(http, ngControl) {
 		_classCallCheck(this, ImageTag);
 
 		_.assign(this, {
 			http: http
 		});
+		ngControl.valueAccessor = this;
+
 		this.imageGroups = [];
+
+		this.onChange = function () {};
+		this.onTouched = function () {};
+		this.selectedImagesControl = new ng.common.Control();
 	}
 
 	ImageTag.prototype.ngOnChanges = function ngOnChanges(changes) {
@@ -175,6 +181,7 @@ var ImageTag = (function () {
 						};
 					}).subscribe(function (imageGroup) {
 						_this.imageGroups.push(imageGroup);
+						_this.selectedImagesControl.updateValue(_this.getSelectedImages());
 					});
 				})();
 			} else {
@@ -184,21 +191,50 @@ var ImageTag = (function () {
 					_.remove(_this.imageGroups, function (imageGroup) {
 						return imageGroup.tag == toRemoveTag;
 					});
+					_this.selectedImagesControl.updateValue(_this.getSelectedImages());
 				})();
 			}
 		} else {
 			this.imageGroups = [];
+			this.selectedImagesControl.updateValue([]);
 		}
+	};
+
+	ImageTag.prototype.getSelectedImages = function getSelectedImages() {
+		return _.map(this.imageGroups, function (imageGroup) {
+			return imageGroup.images[imageGroup.index];
+		});
 	};
 
 	ImageTag.prototype.nextImage = function nextImage(imageGroup) {
 		imageGroup.index = (imageGroup.index + 1) % imageGroup.images.length;
 	};
 
+	ImageTag.prototype.ngOnInit = function ngOnInit() {
+		var _this2 = this;
+
+		this.selectedImagesControl.valueChanges.subscribe(function (value) {
+			// console.log('value: ', value);
+			_this2.onChange(value);
+		});
+	};
+
+	ImageTag.prototype.registerOnChange = function registerOnChange(fn) {
+		this.onChange = fn;
+	};
+
+	ImageTag.prototype.registerOnTouched = function registerOnTouched(fn) {
+		this.onTouched = fn;
+	};
+
+	ImageTag.prototype.writeValue = function writeValue(modelValue) {
+		// Default value goes here
+	};
+
 	return ImageTag;
 })();
 
-ImageTag.parameters = [new ng.core.Inject(ng.http.Http)];
+ImageTag.parameters = [new ng.core.Inject(ng.http.Http), new ng.core.Inject(ng.common.NgControl)];
 _a2['default'].Component({
 	selector: 'image-tag',
 	inputs: ['tags'],
@@ -675,19 +711,6 @@ var FolderComponent = (function () {
 
 			controls[field].updateValue('');
 		}
-	};
-
-	FolderComponent.prototype.searchImagesByTags = function searchImagesByTags(tags) {
-		var _this2 = this;
-
-		console.log('Searching for ' + tags);
-		Rx.Observable.from(tags.split(',')).concatMap(function (tag) {
-			return _this2.http.get('http://localhost:8080/api/crawle-google-image/' + tag);
-		}).map(function (data) {
-			return data.json();
-		}).subscribe(function (result) {
-			return console.log(result);
-		});
 	};
 
 	return FolderComponent;

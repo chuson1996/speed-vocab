@@ -10,9 +10,8 @@
 			br
 			label.label-control Image References
 			input(name="tags", tags-input, [tags-input-control-name]="tags", ngControl="tags", #tags="ngForm")
-			button.btn.btn-success((click)="searchImagesByTags(f.value.tags)") Find image refs
-			image-tag([tags]="f.value.tags")
-			//- input.
+			image-tag([tags]="f.value.tags", ngControl="tagImages")
+
 			br
 			button.btn.btn-success(type="submit", [disabled]="!f.valid") Submit
 		input.form-control(placeholder="Type search key", #key="", type="text", (input))
